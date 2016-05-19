@@ -27,7 +27,7 @@
 \usepackage{algorithmic}
 \usepackage{natbib}
 \usepackage{caption}
-\graphicspath{{.},{img/}}
+\graphicspath{{.},{figures/}}
 
 \usepackage[T1]{fontenc}      % what fonts to use for printing characters (output)
 \usepackage[utf8]{inputenc} % allows the user to input accented characters directly from the keyboard, alternatively can use \usepackage[latin1]{inputenc}
@@ -460,7 +460,35 @@ update rule which exactly corresponds to Eq.~\ref{eq:delta-W}.
 % Such regression update rules have been postulated in the neuroscience
 % literature...
 
+\begin{figure}[htpb]
+  \begin{center}
+    \hspace*{-1cm}\includegraphics[width=0.55\textwidth]{relaxation-convergence-1.png} \hspace*{-1cm}
+    \includegraphics[width=0.55\textwidth]{relaxation-convergence-1-logscale.png}
+  \end{center}
+    \hspace*{-3cm}\begin{minipage}{1.4\textwidth}
+  \caption{Convergence of the inference relaxation, with randomly set weights vs weights obtained
+    by minimizing layerwise reconstruction error (auto-encoder). {\bf Left:} magnitude of the update steps in the
+    space of the vector of all hidden layers state, after each update, vs number of updates. {\bf Right:} same in log-scale.}
+  \label{fig:convergence-1}
+    \end{minipage}
+\end{figure}
+
 \section{Simulation Results}
+
+We have measured the convergence of relaxation to a fixed point in a recurrent network obeying a direct
+version of Eq.~\ref{eq:multi-branch-update}, where odd layers or even layers are updated at each time step,
+according to Eq.~\ref{eq:fp} (seen as a fixed point equation). It means that the bottom-up and top-down
+contributions are averaged, except for the top hidden layer, which only has a bottom-up input.
+The experiments are performed on the MNIST dataset and they compare different settings of the
+weights.
+
+Fig. \ref{fig:convergence-1} (left) shows that convergence is almost instanteneous when the consecutive layers form a
+good auto-encoder, while the right of the figure shows that not only does it start closer to the fixed point but
+it approaches it exponentially at a faster rate. That experiment compares randomly initialized weights
+where the feedback weights equal the transpose of the feedforward weights with weights obtained by training
+a stack of ordinary auto-encoders (with the piecewise-linear non-linearity $\rho(s)=\max(0,\min(1,s))$).
+The neural network has 784 inputs and we tried different hidden layer sizes 500 and 1000, with the
+same results obtained.
 
 \iffalse
 \subsection{Biological Implementation}
@@ -524,7 +552,7 @@ and neuroscience.
 \iffinal
 \section*{Acknowledgments} 
  
-The authors would like to thank Walter Senn, Tong Che and Vincent Dumoulin
+The authors would like to thank Tong Che, Vincent Dumoulin, Kumar Krishna Agarwal
 for feedback and discussions, as well as NSERC, CIFAR, Samsung and
 Canada Research Chairs for funding.%, and Compute Canada for computing resources.
 \fi
