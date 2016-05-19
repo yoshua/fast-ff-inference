@@ -184,7 +184,7 @@ and $J_{i,j} = - W_{i,j} s_i s_j$, where $W$ is a symmetric matrix of weights.
 Boltzmann machines with Gaussian (real-valued) units have a squared containing term for
 each of the Gaussian units, such as $U_i = -\frac{s_i^2}{\sigma_i^2} - s_i b_i$.
 The squared continuous states guarantees that the normalization constant exists (the integral does not diverge).
-In continuous Hopfield networks, we also have $J_{i,j}=W_{i,j} s_i s_j$ while
+In continuous Hopfield networks, we also have $J_{i,j}=- 2 W_{i,j} s_i s_j$ while
 the unary terms involve an integral of the neuron non-linearity~\citep{Hopfield84}:
 $U_i = \int_0^{s_i} \rho^{-1}(s) ds$, where $\rho$ is an element-wise neural non-linearity
 such as the sigmoid. Another interesting energy function is the one proposed
@@ -221,6 +221,7 @@ MCMC in a model associated with the given energy function at some temperature wh
 depends on the ratio of $1/\tau$ to the variance of the injected noise).
 In the case of the Hopfield network (and no noise), the differential equation corresponds
 to a leaky neuron which integrates its inputs:
+% this is confusing and should probably be converted to an eqn with s=voltage rather than firing rate
 \begin{equation}
   \tau \frac{ds_i}{dt} = \rho(\sum_j W_{i,j} s_j) - s_i
 \end{equation}
@@ -240,7 +241,7 @@ layers, each time jumping to the minimum of the energy, conditioned on
 the fixed layers. An example of this approach is developed by~\citet{Scellier+Bengio-arxiv2016}
 for the energy in Eq.~\ref{eq:s+b-energy} and ``hard sigmoid''
 or bounded rectification non-linearity $\rho(s)=\max(0,\min(1,s))$.
-This gives rise to the following updates:
+This provably~\citep{Scellier+Bengio-arxiv2016} gives rise to the following updates:
 \begin{equation}
   \label{eq:direct}
    s_i \leftarrow \rho(\sum_{j\neq i} W_{j,i} \rho(s_j)). % YB: no bias?
@@ -286,13 +287,13 @@ which has a 0-temperature fixed point at
 \end{equation}
 The feedforward contribution $f_k(\vh_{k-1})$ to layer $k$ is typically of the form
 \begin{equation}
-   f_{k,i}(\vh_{k-1}) = \sum_{j \in {\rm layer}\; k-1} W_{i,j} \rho(h_{k-1},j).
+   f_{k,i}(\vh_{k-1}) = \sum_{j \in {\rm layer}\; k-1} W_{i,j} \rho(h_{k-1,j}).
 \end{equation}
 for unit $i$ of layer $k$, with bias $b_i$ and incoming weights $W_{i,j}$ with $j$ from layer $k-1$.
 Similarly, the feedback contribution $g_{k+1}(\vh_{k+1})$ from layer $k+1$ into layer $k$ would
 be of the form
 \begin{equation}
-   g_{k,i}(\vh_{k-1}) = \sum_{j \in {\rm layer}\; k+1} W_{i,j} \rho(h_{k+1},j).
+   g_{k,i}(\vh_{k-1}) = \sum_{j \in {\rm layer}\; k+1} W_{i,j} \rho(h_{k+1,j}).
 \end{equation}
 
 
@@ -316,8 +317,12 @@ where $s_i$ represents the average somatic voltage of neuron $i$ (averaging
 over the short-term variations due to spikes),
 the sum is over different dendritic branches into that neuron, 
 $d_{b,i}$ represents the {\em prediction} made by branch $b$ about the
-state of neuron $i$, and $\alpha_b$ is the weight (or gain) associated
-with branch $b$. For example, $d_{b,i}(\vs)$ could be usual affine prediction
+state of neuron $i$, and $\alpha_b$ is the gain associated
+with branch $b$ that arises from dendritic conductances
+and $\tau = \sum_b \alpha_b$, following~\citet{Urbanczik+Senn-2014}.
+The above difference arises from the diffusion process in the dendritic branch,
+when considering $d_{b,i}$ as a dendritic voltage and $s_i$ as a somatic voltage.
+For example, $d_{b,i}(\vs)$ could be the usual affine prediction
 \begin{equation}
   \label{eq:affine-branch}
    d_{b,i} = c_{b,i} + \sum_j W_{b,i,j} \rho(s_j)
