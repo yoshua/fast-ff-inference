@@ -66,7 +66,7 @@
 %\tableofcontents
 
 \begin{abstract}
-  We consider deep multi-layered generative models such as Boltzmann machines or Hopfield nets in which computation (which implements inference) is both recurrent and stochastic, but where the recurrent is not to model sequential structure, only to perform computation. We find conditions under which a simple feedforward computation is a very good initialization for inference, after the input units are clamped to observed values. It means that after the feedforward initialization, the recurrent network is very close to a fixed point of the network dynamics, where the energy gradient is 0. The main condition is that consecutive layers form a good auto-encoder, or more generally that different groups of inputs into the unit (in particular, bottom-up inputs on one hand, top-down inputs on the other hand) are consistent with each other, producing the same contribution into the total weighted sum of inputs. In biological terms, this would correspond to having each dendritic branch correctly predicting the aggregate input from all the dendritic branches, i.e., the soma potential. This is consistent with the prediction that the synaptic weights into dendritic branches such as those of the apical and basal dendrites of pyramidal cells are trained to minimize the prediction error made by the dendritic branch when the target is the somatic activity. Whereas previous work has shown how to achieve fast negative phase inference (when the model is unclamped) in a predictive recurrent model, this contribution helps to achieve fast positive phase inference (when the target output is clamped) in such recurrent neural models.
+  We consider deep multi-layered generative models such as Boltzmann machines or Hopfield nets in which computation (which implements inference) is both recurrent and stochastic, but where the recurrence is not to model sequential structure, only to perform computation. We find conditions under which a simple feedforward computation is a very good initialization for inference, after the input units are clamped to observed values. It means that after the feedforward initialization, the recurrent network is very close to a fixed point of the network dynamics, where the energy gradient is 0. The main condition is that consecutive layers form a good auto-encoder, or more generally that different groups of inputs into the unit (in particular, bottom-up inputs on one hand, top-down inputs on the other hand) are consistent with each other, producing the same contribution into the total weighted sum of inputs. In biological terms, this would correspond to having each dendritic branch correctly predicting the aggregate input from all the dendritic branches, i.e., the soma potential. This is consistent with the prediction that the synaptic weights into dendritic branches such as those of the apical and basal dendrites of pyramidal cells are trained to minimize the prediction error made by the dendritic branch when the target is the somatic activity. Whereas previous work has shown how to achieve fast negative phase inference (when the model is unclamped) in a predictive recurrent model, this contribution helps to achieve fast positive phase inference (when the target output is clamped) in such recurrent neural models.
 \end{abstract}
 
 \section{Introduction}
@@ -141,7 +141,8 @@ was probably that made by~\citet{Pineda87,Almeida87}, who show one way to comput
   but showing an exponentially fast decay of the gradient being back-propagated.
   Yet another approach was introduced by~\citet{Scellier+Bengio-arxiv2016}, who propose
   to clamp the target output only a very small distance away from the predicted output:
-  in this way the neurons always compute in the way.
+  in this way the neurons always compute according to the same equations, with no
+  need for a different behavior when backpropagating.
 
 \section{Recurrent Stochastic Networks}
 
@@ -159,7 +160,7 @@ with the observed input.
 
 \subsection{Energy-based models}
 
-A particularly common type of non-temporal recurrent network are those
+A particularly common type of non-temporal recurrent networks are those
 whose dynamics correspond to minimizing an energy function or iteratively sampling
 from the transition operator of a corresponding MCMC.
 The energy function is associated with a joint distribution between visible units $\vv$
@@ -183,7 +184,7 @@ In the discrete Boltzmann distribution, $s_i$ are binary-valued, $U_i = -s_i b_i
 and $J_{i,j} = - W_{i,j} s_i s_j$, where $W$ is a symmetric matrix of weights.
 Boltzmann machines with Gaussian (real-valued) units have a squared containing term for
 each of the Gaussian units, such as $U_i = -\frac{s_i^2}{\sigma_i^2} - s_i b_i$.
-The squared continuous states guarantees that the normalization constant exists (the integral does not diverge).
+The squared continuous states guarantee that the normalization constant exists (the integral does not diverge).
 In continuous Hopfield networks, we also have $J_{i,j}=- 2 W_{i,j} s_i s_j$ while
 the unary terms involve an integral of the neuron non-linearity~\citep{Hopfield84}:
 $U_i = \int_0^{s_i} \rho^{-1}(s) ds$, where $\rho$ is an element-wise neural non-linearity
@@ -262,8 +263,8 @@ In general, once implemented in discrete time, iterative inference will be of th
   \label{eq:general-update}
   \vh_k \leftarrow (1-\frac{1}{\tau}) \vh_k + \frac{1}{\tau} F_k(f_k(\vh_{k-1}),g_{k+1}(\vh_{k+1}),{\rm noise})
 \end{equation}
-where $f_k(\vh_{k-1})$ represents the bottom-up contribution into $\vh_k$, from the layer below, $\vh_{k-1}$,
-$g_{k+1}(\vh_{k+1})$ represents the top-down contribution into $\vh_k$, from the layer above, $\vh_{k+1}$.
+where $f_k(\vh_{k-1})$ represents the bottom-up contribution into $\vh_k$, from the layer below, denoted $\vh_{k-1}$,
+$g_{k+1}(\vh_{k+1})$ represents the top-down contribution into $\vh_k$, from the layer above, denoted $\vh_{k+1}$.
 The notation $F_k$ indicates how the bottom-up, top-down and noise are combined. Typically $F_k(a,b,c)=a+b+c$
 or the sum is followed by a non-linearity, or the output $F_k(a,b,c)$ is the result of sampling from a distribution
 (e.g., for the Boltzmann machine with discrete units).
@@ -287,13 +288,13 @@ which has a 0-temperature fixed point at
 \end{equation}
 The feedforward contribution $f_k(\vh_{k-1})$ to layer $k$ is typically of the form
 \begin{equation}
-   f_{k,i}(\vh_{k-1}) = \sum_{j \in {\rm layer}\; k-1} W_{i,j} \rho(h_{k-1,j}).
+   f_{k,i}(\vh_{k-1}) = b_i + \sum_{j \in {\rm layer}\; k-1} W_{i,j} \rho(h_{k-1,j}).
 \end{equation}
 for unit $i$ of layer $k$, with bias $b_i$ and incoming weights $W_{i,j}$ with $j$ from layer $k-1$.
 Similarly, the feedback contribution $g_{k+1}(\vh_{k+1})$ from layer $k+1$ into layer $k$ would
 be of the form
 \begin{equation}
-   g_{k,i}(\vh_{k-1}) = \sum_{j \in {\rm layer}\; k+1} W_{i,j} \rho(h_{k+1,j}).
+   g_{k,i}(\vh_{k-1}) = b_i + \sum_{j \in {\rm layer}\; k+1} W_{i,j} \rho(h_{k+1,j}).
 \end{equation}
 
 
