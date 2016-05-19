@@ -440,6 +440,9 @@ to updates of the form
 \end{equation}
 where $s_i$ (the somatic voltage) acts like a target of a linear
 regression with predictor $d_{b,i}(\vs)$, with inputs $\rho(s_j)$.
+This corresponds to a biological form of the classical error-correcting
+rule~\citep{Widrow62}, with the modern biological interpretation
+given by~\citet{Urb+Sn-2014}.
 
 Interestingly, such learning rules have been proposed in the
 neuroscience literature~\citep{Urbanczik+Senn-2014}, in the
@@ -456,6 +459,8 @@ update rule which exactly corresponds to Eq.~\ref{eq:delta-W}.
 % Such regression update rules have been postulated in the neuroscience
 % literature...
 
+\section{Simulation Results}
+
 \iffalse
 \subsection{Biological Implementation}
 
@@ -471,7 +476,8 @@ update rule which exactly corresponds to Eq.~\ref{eq:delta-W}.
 \section{Conclusion}
 
 We have proposed conditions under which a recurrent stochastic network would perform fast approximate inference
-that is equivalent to running only a feedforward pass from inputs into deep hidden layers. These conditions
+that is equivalent to running only a feedforward pass from inputs into deep hidden layers and shortcuts
+the biological relaxation process. These conditions
 would avoid the need for a lengthy iterative inference to either reach a fixed point or a stationary distribution
 associated with the conditional distribution of hidden layers given a visible layer. This could be useful
 both to speed-up training and using of such models, as well as a biologically plausible way to achieve
@@ -479,7 +485,12 @@ fast inference that matches well with recent successes obtained with feedforward
 with back-propagation. The main ingredient of these assumptions is that different dendritic branches
 predict the average of their mutual prediction, or in the case where there are only bottom-up
 and top-down branches, each pair of successive layers
-forms a good auto-encoder. Interestingly, this matches recent proposals for synaptic update rules
+forms a good auto-encoder. Because a fixed point of this recurrent bottom-up top-down circuitry
+can be explicitly calculate (approximately to the extent that the reconstruction error is small),
+a single effective feedforward pass already lands very close to the fixed point and from this
+the fixed point is reached very quickly.
+Interestingly, the kind of training objective that enables this fast convergence property
+matches recent proposals for synaptic update rules
 in multi-compartment models of pyramidal cells~\citep{Urbanczik+Senn-2014}, with neural computation
 differential equations that essentially correspond to the multi-branch dynamics
 of Eq.~\ref{eq:multi-branch-update} and the updates of Eq.~\ref{eq:delta-W}.
