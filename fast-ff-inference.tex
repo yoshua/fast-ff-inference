@@ -279,6 +279,8 @@ a Markov chain whose stationary distribution is associated with some wanted ener
 When $\tau=1$ the above is a direct update (like in the block Gibbs update of Eq.~\ref{eq:gibbs-update}
 or jumping to the analytic solution of Eq.~\ref{eq:direct}), whereas when $\tau>1$ the layer $\vh_k$
 gradually moves towards $F_k(f_k(\vh_{k-1}),g_{k+1}(\vh_{k+1}),0)$ (or wanders around it if noise is injected).
+A direct update is very efficient and is guaranteed to down the energy when there are no lateral connections and only connections
+between successive layers.
 Stochastic versions use the injected noise argument to actually sample $\vh_k$ from a conditional
 distribution. The $\vh_k$ argument is used to account for inertia in the update, e.g., a discrete-time
 implementation of Eq.~\ref{eq:dsdt} would only gradually modify the value of $\vh_k$ towards the
@@ -453,8 +455,8 @@ objective function (for each dendritic branch $b$ of neuron $i$) of the form
 \end{equation}
 that is minimized when Eq.~\ref{eq:condition} is satisfied. If $d_{b,i}$
 follows the usual affine form of Eq.~\ref{eq:affine-branch}, then
-the gradient of $C_{b,i}$ with respect to $W_{b,i,j}$ gives rise
-to updates of the form
+the gradient of $C_{b,i}$ with respect to $W_{b,i,j}$ contains a 
+term corresponding to updates of the form
 \begin{equation}
   \label{eq:delta-W}
    \Delta W_{b,i,j} \propto (s_i - d_{b,i}(\vs)) \rho(s_j)
@@ -463,7 +465,10 @@ where $s_i$ (the somatic voltage) acts like a target of a linear
 regression with predictor $d_{b,i}(\vs)$, with inputs $\rho(s_j)$.
 This corresponds to a biological form of the classical error-correcting
 rule~\citep{Widrow62}, with the modern biological interpretation
-given by~\citet{Urbanczik+Senn-2014}.
+given by~\citet{Urbanczik+Senn-2014}. However, Eq.~\ref{eq:delta-W}
+does not take into account the contribution of $W_{b,i,j}$ on $C_{b,i}$
+via the value of $s_j$ at the fixed point and future work should
+investigate how to take that into account.
 
 Interestingly, a synaptic update rule which exactly implements
 Eq.~\ref{eq:delta-W} has been proposed in the neuroscience literature in the
