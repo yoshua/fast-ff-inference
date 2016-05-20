@@ -197,9 +197,11 @@ by~\citet{Bengio-arxiv2015} and \citet{Scellier+Bengio-arxiv2016}:
 These papers study this energy function in order to emulate back-propagation
 in the recurrent network through a form of contrastive Hebbian learning which
 corresponds to the standard spike-timing dependent plasticity (STDP).
-However, they require some form of iterative inference (which could take hundreds of
-time steps) to approximately find a fixed point of
+However, they require some form of iterative inference
+to approximately find a fixed point of
 the neural dynamics that locally minimizes the energy function.
+Experiments reported by \citet{Scellier+Bengio-arxiv2016} suggest that the time needed for sufficient
+convergence to the fixed point grows badly with the number of layers.
 
 \subsection{Iterative Inference}
 
@@ -220,7 +222,7 @@ typically do not consider any injected noise (i.e., equivalently temperature is 
 stochastic process corresponds to Langevin dynamics (in discrete time, a Langevin
 MCMC in a model associated with the given energy function at some temperature which
 depends on the ratio of $1/\tau$ to the variance of the injected noise).
-In the case of the Hopfield network (and no noise), the differential equation corresponds
+In the case of the continuous Hopfield network (and no noise), the differential equation corresponds
 to a leaky neuron which integrates its inputs:
 % this is confusing and should probably be converted to an eqn with s=voltage rather than firing rate
 \begin{equation}
@@ -369,7 +371,7 @@ Let us compare this solution to the result of performing {\em only feedforward
   \vh_k = \vd_{0,k}(\vh_{k-1}) = f_k(\vh_{k-1})
 \end{equation}
 where $\vh_0=\vv$, and $\vd_{b,k}(\vh_{k-1})$ is the vector
-containing the output of the feeedforward (bottom-up) branch $d_{0,i}$ for all units $i$ in layer $k$,
+containing the output of the feedforward (bottom-up) branch $d_{b,i}$ for all units $i$ in layer $k$,
 and depending only on the activations of units in layer $k-1$.
 To match Eq.~\ref{eq:ff-result} and Eq.~\ref{eq:fp} it is enough
 to have
