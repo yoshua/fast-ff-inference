@@ -226,7 +226,7 @@ to a leaky neuron which integrates its inputs:
 \begin{equation}
   \tau \frac{ds_i}{dt} = \rho(\sum_j W_{i,j} s_j) - s_i
 \end{equation}
-which has a fixed point when 
+which has a fixed point when
 \begin{equation}
    s_i = \rho(\sum_j W_{i,j} s_j).
 \end{equation}
@@ -238,7 +238,7 @@ for the value of $s_i$ for all units on the same layer that minimize the
 energy, given the values of the units in the other layers. In particular,
 if the only connections are between successive layers, it means that it is
 possible to alternatively update all the odd layers and then all the even
-layers, each time jumping to the minimum of the energy, conditioned on 
+layers, each time jumping to the minimum of the energy, conditioned on
 the fixed layers. An example of this approach is developed by~\citet{Scellier+Bengio-arxiv2016}
 for the energy in Eq.~\ref{eq:s+b-energy} and ``hard sigmoid''
 or bounded rectification non-linearity $\rho(s)=\max(0,\min(1,s))$.
@@ -305,9 +305,9 @@ Let us consider a layered architecture such as those discussed above,
 in which the connections into each neuron are split into {\em groups},
 which biologically may correspond to dendritic branches. For example,
 we talk below about the group of bottom-up connections (from the lower layer)
-and the group of top-down connections (from the upper layer). 
+and the group of top-down connections (from the upper layer).
 Signal coming into the neuron from each group $b$ below may be modulated by
-a different gain (the $\alpha_b$ below), so that 
+a different gain (the $\alpha_b$ below), so that
 the recurrent dynamics are governed by the following differential
 equation, for neuron $i$:
 \begin{equation}
@@ -316,14 +316,27 @@ equation, for neuron $i$:
 \end{equation}
 where $s_i$ represents the average somatic voltage of neuron $i$ (averaging
 over the short-term variations due to spikes),
-the sum is over different dendritic branches into that neuron, 
+the sum is over different dendritic branches into that neuron,
 $d_{b,i}$ represents the {\em prediction} made by branch $b$ about the
 state of neuron $i$, and $\alpha_b$ is the gain associated
 with branch $b$ that arises from dendritic conductances
 and $\tau = \sum_b \alpha_b$, following~\citet{Urbanczik+Senn-2014}.
-The above difference arises from the diffusion process in the dendritic branch,
-when considering $d_{b,i}$ as a dendritic voltage and $s_i$ as a somatic voltage.
-For example, $d_{b,i}(\vs)$ could be the usual affine prediction
+The above difference arises from the diffusion process in the dendritic
+branch~\citep{Koch2004}, when considering $d_{b,i}$ as a dendritic voltage and
+$s_i$ as a somatic voltage. Interestingly, for neuronal morphologies with a
+strongly bidirectional (ortho- and antidromic) compartmental coupling, such
+gain factors become dynamic quantities which are mainly determined by the total
+excitatory and inhibitory input synaptic branch
+conductances~\citep{Sacramento2016}. This could provide an additional mechanism
+enabling a dynamical reweighting of the contribution $d_{b,i}(\vs)$ of each
+branch to the somatic potential $s_i$; alternatively, such gains could be
+adapted on a slow timescale via branch strength plasticity~\citep{Losonczy2008}.
+For simplicity, here we take the dendritic branch gains $\alpha_b$ constant,
+nonethewise an excellent approximation when the antidromic flow of current from
+the soma back to the dendritic compartments is
+small~\citep{Urbanczik+Senn-2014}.
+
+We model $d_{b,i}(\vs)$ as the usual affine prediction
 \begin{equation}
   \label{eq:affine-branch}
    d_{b,i} = c_{b,i} + \sum_j W_{b,i,j} \rho(s_j)
@@ -401,7 +414,7 @@ associated with the inference task, which is very convenient.
 
 \section{Synaptic Learning Rules Giving Rise to the Good Mutual Prediction Condition}
 
-Now, why would consecutive layers form a good one-layer auto-encoder? 
+Now, why would consecutive layers form a good one-layer auto-encoder?
 That clearly depends on the particulars of the training framework, but
 several elements of existing learning algorithms for such networks conspire
 to make successive layers good auto-encoders. For example, in the case
@@ -443,18 +456,28 @@ where $s_i$ (the somatic voltage) acts like a target of a linear
 regression with predictor $d_{b,i}(\vs)$, with inputs $\rho(s_j)$.
 This corresponds to a biological form of the classical error-correcting
 rule~\citep{Widrow62}, with the modern biological interpretation
-given by~\citet{Urb+Sn-2014}.
+given by~\citet{Urbanczik+Senn-2014}.
 
-Interestingly, such learning rules have been proposed in the
-neuroscience literature~\citep{Urbanczik+Senn-2014}, in the
-context of multi-compartment models in which a separate
+Interestingly, a synaptic update rule which exactly implements
+Eq.~\ref{eq:delta-W} has been proposed in the neuroscience literature in the
+context of multi-compartment spiking models in which a separate
 differential equation governs the voltage in each compartment:
 the compartments of interest here are the soma (where the action
 potentials or output spikes are emitted) and one or more dendritic
-compartments. By considering the signal ``back-propagated'' from
-the soma to the dendritic branches in order to implement synaptic
-learning, ~\citet{Urbanczik+Senn-2014} postulate a synaptic
-update rule which exactly corresponds to Eq.~\ref{eq:delta-W}.
+compartments. It has been shown that a plasticity rule which is both voltage-
+and spike-timing-dependent turns  dendritic synapses into optimal predictors
+of the somatic potential~\citep{Urbanczik+Senn-2014}. Due to the near-Poisson
+spiking of in vivo cortical neurons~\citep{Shadlen1998}, action potentials
+provide an unbiased instantaneous estimate of the underlying target somatic
+potential; plasticity is then driven by the difference between local branch
+voltage and back-propagation action potentials (bAPs). Interestingly, there is
+strong biological evidence for such class of rules: the modulation of
+plasticity by voltage~\citep{Artola1990,Sjostrom2001} and
+bAPs~\citep{Koester1998} has been clearly established, while a closely related
+phenomenological model captures a large variety of experimental
+results~\citep{Clopath2010}. Furthermore, the obtained specific dependence on
+pre- and post-synaptic spike times can reproduce~\citep{Brea2013} the classical
+causal STDP kernel~\citep{Gerstner1996}.
 
 
 % Such regression update rules have been postulated in the neuroscience
@@ -529,7 +552,7 @@ sets of weights that can give rise to small reconstruction error.  This paper ma
 on how inference could be performed efficiently, but more work is needed to build a biologically plausible
 theory of learning that, from a machine learning perspective, explains how all the layers can be
 trained together towards better fitting the observed data or rewards.
-Recent work~\citep{Scellier+Bengio-arxiv2016} has shown how 
+Recent work~\citep{Scellier+Bengio-arxiv2016} has shown how
 inference in the kind of recurrent network discussed here (with computation
 corresponding to minimizing an energy function) could be considerably
 sped-up by only considering a small perturbation away from the positive
@@ -550,8 +573,8 @@ a challenge for future investigations aiming to bridge the gap between deep lear
 and neuroscience.
 
 \iffinal
-\section*{Acknowledgments} 
- 
+\section*{Acknowledgments}
+
 The authors would like to thank Tong Che, Vincent Dumoulin, Kumar Krishna Agarwal
 for feedback and discussions, as well as NSERC, CIFAR, Samsung and
 Canada Research Chairs for funding.%, and Compute Canada for computing resources.
@@ -563,7 +586,7 @@ Canada Research Chairs for funding.%, and Compute Canada for computing resources
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% BIBLIOGRAPHIE %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\bibliographystyle{natbib}
-\bibliography{strings,ml,aigaion,biblio}
+\bibliographystyle{unsrtnat}
+\bibliography{strings,ml,aigaion,biblio,neurosci}
 
 \end{document}
