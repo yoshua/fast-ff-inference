@@ -200,8 +200,9 @@ corresponds to the standard spike-timing dependent plasticity (STDP).
 However, they require some form of iterative inference
 to approximately find a fixed point of
 the neural dynamics that locally minimizes the energy function.
-Experiments reported by \citet{Scellier+Bengio-arxiv2016} suggest that the time needed for sufficient
-convergence to the fixed point grows badly with the number of layers.
+Furthermore, experiments reported by \citet{Scellier+Bengio-arxiv2016} suggest that the time needed for sufficient
+convergence to the fixed point grows badly with the number of layers. Avoiding
+such lengthy convergence of iterative inference motivates the work presented here.
 
 \subsection{Iterative Inference}
 
@@ -512,7 +513,7 @@ good auto-encoder, while the right of the figure shows that not only does it sta
 it approaches it exponentially at a faster rate. That experiment compares randomly initialized weights
 where the feedback weights equal the transpose of the feedforward weights with weights obtained by training
 a stack of ordinary auto-encoders (with the piecewise-linear non-linearity $\rho(s)=\max(0,\min(1,s))$).
-The neural network has 784 inputs and we tried different hidden layer sizes 500 and 1000, with the
+The neural network has 784 inputs and 3 hidden layers and we tried different hidden layer sizes 500 and 1000, with the
 same results obtained.
 
 \iffalse
