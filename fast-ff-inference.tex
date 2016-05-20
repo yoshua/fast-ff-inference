@@ -231,10 +231,10 @@ to a leaky neuron which integrates its inputs:
   \tau \frac{ds_i}{dt} = \sum_j W_{i,j} \rho(s_j) - s_i,
 \end{equation}
 which corresponds to going down the energy according to
-$\tau \frac{ds_i}{dt} = - \frac{\partial E(\vs)}{\partial \rho(s_i)}$. A fixed
+$\tau \frac{ds_i}{dt} = - \frac{\partial E(\vs)}{\partial s_i}$. A fixed
 point is reached when
 \begin{equation}
-   s_i = \sum_j W_{i,j} \rho(s_j).
+   s_i = \rho'(s_i) \sum_j W_{i,j} \rho(s_j).
 \end{equation}
 
 When the architecture has no lateral connection ($W_{i,j}=0$ for units on the same layer),
@@ -304,7 +304,6 @@ be of the form
 \end{equation}
 
 
-
 \section{Sufficient Conditions for Fast Feedforward Approximate Inference}
 
 Let us consider a layered architecture such as those discussed above,
@@ -312,7 +311,7 @@ in which the connections into each neuron are split into {\em groups},
 which biologically may correspond to dendritic branches. For example,
 we talk below about the group of bottom-up connections (from the lower layer)
 and the group of top-down connections (from the upper layer).
-Signal coming into the neuron from each group $b$ below may be modulated by
+Signals coming into the neuron from each group $b$ below may be modulated by
 a different gain (the $\alpha_b$ below), so that
 the recurrent dynamics are governed by the following differential
 equation, for neuron $i$:
@@ -326,22 +325,12 @@ the sum is over different dendritic branches into that neuron,
 $d_{b,i}$ represents the {\em prediction} made by branch $b$ about the
 state of neuron $i$, and $\alpha_b$ is the gain associated
 with branch $b$ that arises from dendritic conductances
-and $\tau = \sum_b \alpha_b$, following~\citet{Urbanczik+Senn-2014}. Typically
-$\tau$ is short, on the order of a few milliseconds, the so-called high conductance
-in vivo cortical state~\citep{Destexhe2003}. The above difference arises from the diffusion process in the dendritic
-branch~\citep{Koch2004}, when considering $d_{b,i}$ as a dendritic voltage and
-$s_i$ as a somatic voltage. Interestingly, for neuronal morphologies with a
-strongly bidirectional (ortho- and antidromic) compartmental coupling, such
-gain factors become dynamic quantities which are mainly determined by the total
-excitatory and inhibitory input synaptic branch
-conductances~\citep{Sacramento2016}. This could provide an additional mechanism
-enabling a dynamical reweighting of the contribution $d_{b,i}(\vs)$ of each
-branch to the somatic potential $s_i$; alternatively, such gains could be
+and $\tau = \sum_b \alpha_b$, following~\citet{Urbanczik+Senn-2014}. In the presence of synaptic bombardment that defines the so-called high-conductance state, as it is observed {\em in vivo} in some cortical areas, $\tau$ is short, on the order of a few milliseconds ~\citep{Destexhe2003}. When interpreting $d_{b,i}$ as dendritic voltages and
+$s_i$ as a somatic voltage, their differences in (\ref{eq:multi-branch-update}) arises from the diffusion process these voltages are subject to in a branching cable~\citep{Koch2004}. The gains $\alpha_b$ appear as a dendritic coupling strength that, for conductance-based synaptic inputs and strongly bi-directional somato-dendritic coupling, become dynamic quantities that are mainly determined by the total excitatory and inhibitory synaptic conductance on branch $b$~\citep{Sacramento2016}. This could provide an additional mechanism
+enabling a dynamical re-weighting of the contribution $d_{b,i}(\vs)$ of each dendritic branch to the somatic potential $s_i$. But such gains could also be
 adapted on a slow timescale via branch strength plasticity~\citep{Losonczy2008}.
-For simplicity, here we take the dendritic branch gains $\alpha_b$ constant,
-nonetheless an excellent approximation when the antidromic flow of current from
-the soma back to the dendritic compartments is
-small~\citep{Urbanczik+Senn-2014}.
+For simplicity, we take the dendritic branch gains $\alpha_b$ to be constant, which is a good approximation when the antidromic current flow from
+the soma back to the dendritic compartments is small~\citep{Urbanczik+Senn-2014}.
 
 We model $d_{b,i}(\vs)$ as the usual affine prediction
 \begin{equation}
@@ -354,12 +343,12 @@ Below we consider the special case where there
 are only two branches, a bottom-up branch ($b=0$) computing the feedforward activations
 $f_k(\vh_{k-1})$ into layer $k$, from layer $k-1$, and a top-down branch computing the
 feedback activations $g_{k+1}(\vh_{k+1})$ into layer $k$, from layer $k+1$. There
-could also be dendritic branches accounting for lateral connections or from other areas.
+could also be dendritic branches accounting for lateral connections or from other areas. 
 From a biological perspective, we can think of the dendritic branch receiving bottom-up connections
 as the basal dendritic branch, while the dendritic branch receiving top-down connections
 as the apical dendritic branch.
 The basal and apical dendritic branches are well-studied in the case of cortical layer 5
-pyramidal neurons, a very large and ubiquitous type of neuron.
+pyramidal neurons, a very large and ubiquitous type of neuron \cite{Larkum2013}.
 
 The 0-temperature fixed point of Eq.~\ref{eq:multi-branch-update} is obtained
 by setting the left-hand side to 0 and solving:
@@ -461,31 +450,11 @@ to updates of the form
 \end{equation}
 where $s_i$ (the somatic voltage) acts like a target of a linear
 regression with predictor $d_{b,i}(\vs)$, with inputs $\rho(s_j)$.
-This corresponds to a biological form of the classical error-correcting
-rule~\citep{Widrow62}, with the modern biological interpretation
-given by~\citet{Urbanczik+Senn-2014}.
+This corresponds to a biological form of the classical error-correcting learning rule~\citep{Widrow62}. 
 
-Interestingly, a synaptic update rule which exactly implements
-Eq.~\ref{eq:delta-W} has been proposed in the neuroscience literature in the
-context of multi-compartment spiking models in which a separate
-differential equation governs the voltage in each compartment:
-the compartments of interest here are the soma (where the action
-potentials or output spikes are emitted) and one or more dendritic
-compartments. It has been shown that a plasticity rule which is both voltage-
-and spike-timing-dependent turns  dendritic synapses into optimal predictors
-of the somatic potential~\citep{Urbanczik+Senn-2014}. Due to the near-Poisson
-spiking of in vivo cortical neurons~\citep{Shadlen1998}, action potentials
-provide an unbiased instantaneous estimate of the underlying target somatic
-potential; plasticity is then driven by the difference between local branch
-voltage and back-propagation action potentials (bAPs). Interestingly, there is
-strong biological evidence for such class of rules: the modulation of
-plasticity by voltage~\citep{Artola1990,Sjostrom2001} and
-bAPs~\citep{Koester1998} has been clearly established, while a closely related
-phenomenological model captures a large variety of experimental
-results~\citep{Clopath2010}. Furthermore, the obtained specific dependence on
-pre- and post-synaptic spike times can reproduce~\citep{Brea2013} the classical
-causal STDP kernel~\citep{Gerstner1996}.
-
+The plasticity rule derived in Eq.~\ref{eq:delta-W} can also be seen in the context of dendritic predictions of somatic spiking~\citep{Urbanczik+Senn-2014}. In this biological version of the rule, the difference between the somatic and dendritic voltage is replaced by the difference between the instantaneous somatic spike rate and the rate predicted by the dendritic voltage. Both quantities can be read out by the dendritic synapse, the back-propagating action potential (bAP) and the local dendritic voltage.  Due to the near-Poisson
+spiking of in vivo cortical neurons~\citep{Shadlen1998}, the instantaneous rate of action potentials
+provides an unbiased estimate of the underlying somatic voltage $s_i$. There is in fact experimental evidence that plasticity depends on the postsynaptic voltage~\citep{Artola1990,Sjostrom2001} and bAPs~\citep{Markram1997}, see~\citep{Clopath2010} for a phenomenological model. Classical spike-timing dependent plasticity (STDP, \citet{Markram1997}) is reproduced by a spiking version of rule (\ref{eq:delta-W}) in a 1-compartment neuron~\citep{Brea2013}.
 
 % Such regression update rules have been postulated in the neuroscience
 % literature...
