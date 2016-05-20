@@ -228,13 +228,11 @@ In the case of the continuous Hopfield network (and no noise), the differential 
 to a leaky neuron which integrates its inputs:
 % this is confusing and should probably be converted to an eqn with s=voltage rather than firing rate
 \begin{equation}
-  \tau \frac{ds_i}{dt} = \sum_j W_{i,j} \rho(s_j) - s_i,
+  \tau \frac{ds_i}{dt} = \rho'(s_i) \left( \sum_j W_{i,j} \rho(s_j) - s_i \right)\,.
 \end{equation}
-which corresponds to going down the energy according to
-$\tau \frac{ds_i}{dt} = - \frac{\partial E(\vs)}{\partial s_i}$. A fixed
-point is reached when
+A fixed point is reached when
 \begin{equation}
-   s_i = \rho'(s_i) \sum_j W_{i,j} \rho(s_j).
+   s_i = \sum_j W_{i,j} \rho(s_j).
 \end{equation}
 
 When the architecture has no lateral connection ($W_{i,j}=0$ for units on the same layer),
