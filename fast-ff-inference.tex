@@ -185,9 +185,10 @@ and $J_{i,j} = - W_{i,j} s_i s_j$, where $W$ is a symmetric matrix of weights.
 Boltzmann machines with Gaussian (real-valued) units have a squared containing term for
 each of the Gaussian units, such as $U_i = -\frac{s_i^2}{\sigma_i^2} - s_i b_i$.
 The squared continuous states guarantee that the normalization constant exists (the integral does not diverge).
-In continuous Hopfield networks, we also have $J_{i,j}=- 2 W_{i,j} s_i s_j$ while
+In continuous Hopfield networks, we also have $J_{i,j}=- W_{i,j} \rho(s_i) \rho(s_j)$ while
 the unary terms involve an integral of the neuron non-linearity~\citep{Hopfield84}:
-$U_i = \int_0^{s_i} \rho^{-1}(s) ds$, where $\rho$ is an element-wise neural non-linearity
+$U_i = \int_0^{\rho(s_i)} \rho^{-1}(s) ds$ (excluding biases for simplicity), where $s_i$ can be seen as the
+voltage of neuron $i$ and $\rho$ as an element-wise neural transfer function
 such as the sigmoid. Another interesting energy function is the one proposed
 by~\citet{Bengio-arxiv2015} and \citet{Scellier+Bengio-arxiv2016}:
 \begin{equation}
@@ -227,11 +228,13 @@ In the case of the continuous Hopfield network (and no noise), the differential 
 to a leaky neuron which integrates its inputs:
 % this is confusing and should probably be converted to an eqn with s=voltage rather than firing rate
 \begin{equation}
-  \tau \frac{ds_i}{dt} = \rho(\sum_j W_{i,j} s_j) - s_i
+  \tau \frac{ds_i}{dt} = \sum_j W_{i,j} \rho(s_j) - s_i,
 \end{equation}
-which has a fixed point when
+which corresponds to going down the energy according to
+$\tau \frac{ds_i}{dt} = - \frac{\partial E(\vs)}{\partial \rho(s_i)}$. A fixed
+point is reached when
 \begin{equation}
-   s_i = \rho(\sum_j W_{i,j} s_j).
+   s_i = \sum_j W_{i,j} \rho(s_j).
 \end{equation}
 
 When the architecture has no lateral connection ($W_{i,j}=0$ for units on the same layer),
